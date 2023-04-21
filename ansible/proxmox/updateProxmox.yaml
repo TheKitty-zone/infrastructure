@@ -1,14 +1,14 @@
 - hosts: proxmox
   become: true
+  become_user: root
+
   tasks:
   - name: update repository
     apt:
       update_cache: yes
 
   - name: upgrade all packages
-    apt:
-      name: "*"
-      state: latest
+    apt: upgrade=dist
 
   - name: check if reboot is required
     register: reboot_required_file
