@@ -1,0 +1,79 @@
+---
+caddy:
+  # Static config that will be appended to the generated Caddyfile
+  # e.g acme etc.
+  # Templating is supported.
+  static_config: |
+    {
+        acme_dns cloudflared {{ lookup('env', 'CLOUDFLARE_API_TOKEN') }}
+    }
+    # Authelia Portal.
+    auth.{{ global.base_domain }} {
+            reverse_proxy authelia:9091
+    }
+  # Dynamic config that will be appended to the generated Caddyfile
+  # e.g reverse_proxy etc.
+  hosts:
+    groups:
+      "*Arr":
+        type: group
+        base_upstream: 172.17.0.1
+        domains:
+          - domain: "sonarr.{{ global.base_domain }}"
+            upstream_port: 8989
+          - domain: "radarr.{{ global.base_domain }}"
+            upstream_port: 7878
+          - domain: "readarr.{{ global.base_domain }}"
+            upstream_port: 8787
+            additonal_config: ""
+          - domain: "lidarr.{{ global.base_domain }}"
+            upstream_port: 8686
+        use_authelia: true
+    apps:
+      "Jellyfin":
+        type: app
+        domain: "jelly.{{ global.base_domain }}"
+        upstream: 172.17.0.1:8096
+        use_authelia: true
+
+      "Jellyseerr":
+        type: app
+        domain: "jellyseerr.{{ global.base_domain }}"
+        upstream: 172.17.0.1:5055
+        use_authelia: true
+
+      "portainer":
+        type: app
+        domain: "docker.{{ global.base_domain }}"
+        upstream: 172.17.0.1:9000
+        use_authelia: true
+
+      "Grafana":
+        type: app
+        domain: "grafana.{{ global.base_domain }}"
+        upstream: 172.17.0.1:3000
+        use_authelia: true
+
+      "Mealie":
+        type: app
+        domain: "mealie.{{ global.base_domain }}"
+        upstream: 172.17.0.1:9925
+        use_authelia: true
+
+      "Prometheus":
+        type: app
+        domain: "prom.{{ global.base_domain }}"
+        upstream: 172.17.0.1:9100
+        use_authelia: true
+
+      "Sabnzbd":
+        type: app
+        domain: "sab.{{ global.base_domain }}"
+        upstream: 172.17.0.1:8080
+        use_authelia: true
+
+      "Seafile":
+        type: app
+        domain: "sea.cloud.yuri.li"
+        upstream: 172.17.0.1:8947
+        use_authelia: true

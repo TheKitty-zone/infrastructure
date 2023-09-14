@@ -1,0 +1,34 @@
+# The appsfile template, that will be tampleted here.
+# You have access to all variables defined in ansible
+# static configuration
+{{ caddy.static_config }}
+
+{% for group_name  in apps.hosts.groups %}
+# Group {{ group_name }}:
+{% for app in apps.hosts.groups[group_name].domains %}
+{{ app.domain }} {
+{% if apps.hosts.groups[group_name].use_authelia %}
+        forward_auth 172.17.0.1:9091 {
+                uri /api/verify?rd=https://auth.{{ global.base_domain }}/
+                copy_headers Remote-User Remote-Groups Remote-Name Remote-Email
+        }
+{% endif %}
+        reverse_proxy {{ apps.hosts.groups[group_name].base_upstream }}:{{ app.upstream_port }} {
+        }
+}
+{% endfor %}
+{% endfor %}
+{% for app_name in apps.hosts.apps %}
+# App {{ app_name }}:
+{{ apps.hosts.apps[app_name].domain }} {
+{% if apps.hosts.apps[app_name].use_authelia %}
+        forward_auth 172.17.0.1:9091 {
+                uri /api/verify?rd=https://auth.{{ global.base_domain }}/
+                copy_headers Remote-User Remote-Groups Remote-Name Remote-Email
+        }
+{% endif %}
+        reverse_proxy {{ apps.hosts.apps[app_name].upstream }}{
+        }
+}
+{% endfor %}
+

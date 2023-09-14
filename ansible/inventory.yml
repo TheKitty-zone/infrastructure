@@ -1,0 +1,12 @@
+# Inventory that declares a server with its name as well as its IP address and SSH port.
+# It also specifies the hosts for the caddy_ansible role.
+---
+servers:
+  hosts:
+    caddy:
+      ansible_host: 46.4.241.139
+      ansible_connection: ssh
+      ansible_user: root
+      ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+      ansible_become: true
+        

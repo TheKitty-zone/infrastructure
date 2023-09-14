@@ -1,0 +1,13 @@
+---
+docker:
+  hosts:
+    apps:
+      "Jellyfin":
+        name: Jellyfin
+        container_name: jellyfin
+        environment_vars:
+          - PUID=1000
+          - PGID=1000
+          - TZ=Europe/London
+          - UMASK_SET=022 #optional
+          - RUN_OPTS= #optional

@@ -1,0 +1,32 @@
+name: Run Ansible
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ansible/**
+      - .github/workflows/ansible.yml
+
+jobs:
+  ansible:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install SSH Key for the server 
+        uses: shimataro/ssh-key-action@v2 
+        with: 
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Install Ansible
+        run: |
+          sudo apt update
+          sudo apt install software-properties-common
+          sudo apt-add-repository --yes --update ppa:ansible/ansible
+          sudo apt install ansible
+      - name: Run Ansible
+        run: |
+          ansible-playbook -i ansible/inventory ansible/playbook.yml 
