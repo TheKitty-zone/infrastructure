@@ -82,8 +82,8 @@ caddy:
         upstream: 172.17.0.1:8948
         use_authelia: false
 
-      "QBittorrent":
+      "Deluge":
         type: app
         domain: "torrent.{{ global.base_domain }}"
-        upstream: 172.17.0.1:8200
+        upstream: 172.17.0.1:8112
         use_authelia: false
