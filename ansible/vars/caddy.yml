@@ -22,7 +22,6 @@ caddy:
             upstream_port: 7878
           - domain: "readarr.{{ global.base_domain }}"
             upstream_port: 8787
-            additonal_config: ""
           - domain: "lidarr.{{ global.base_domain }}"
             upstream_port: 8686
         use_authelia: false
@@ -81,4 +80,10 @@ caddy:
         disable_dns_challenge: true
         domain: "dash.cloud.yuri.li"
         upstream: 172.17.0.1:8948
+        use_authelia: false
+
+      "QBittorrent":
+        type: app
+        domain: "torrent.{{ global.base_domain }}"
+        upstream: 172.17.0.1:8200
         use_authelia: false
