@@ -27,7 +27,7 @@
                 copy_headers Remote-User Remote-Groups Remote-Name Remote-Email
         }
 {% endif %}
-        reverse_proxy {{ apps.hosts.apps[app_name].upstream }}{
+        reverse_proxy {{ apps.hosts.apps[app_name].upstream }} {
         }
 }
 {% endfor %}
