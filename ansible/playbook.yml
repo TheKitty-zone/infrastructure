@@ -7,6 +7,7 @@
     - name: Combine vars
       set_fact:
         apps: "{{ caddy | combine(docker, recursive=True) }}"
+      when: caddy is defined and docker is defined
 
     - name: Template the Caddyfile
       template: src=../templates/Caddyfile.j2 dest=/root/Caddyfile.j2
