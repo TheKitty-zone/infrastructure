@@ -35,6 +35,7 @@
       caddy_update: true
       caddy_systemd_capabilities_enabled: true
       caddy_systemd_network_dependency: false
+      caddy_packages: ["github.com/caddy-dns/cloudflare"]
       caddy_config: "{{ lookup('template', './Caddyfile.j2') }}"
       notify:
       - Clean up template Caddyfile
