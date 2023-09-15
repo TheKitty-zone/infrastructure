@@ -39,8 +39,3 @@
       caddy_config: "{{ lookup('template', './Caddyfile.j2') }}"
       notify:
       - Clean up template Caddyfile
-  handlers:
-    - name: Clean up template Caddyfile
-      file:
-        path: ./Caddyfile.j2
-        state: absent
