@@ -1,6 +1,5 @@
-- hosts: localhost
-  gather_facts: false
-  connection: local
+- hosts: caddy
+  user: root
   tasks:
     - name: Merge vars
       ansible.builtin.include_vars:
@@ -8,12 +7,10 @@
     - name: Combine vars
       set_fact:
         apps: "{{ caddy | combine(docker, recursive=True) }}"
-    - name: Debug
-      debug:
-        msg: "{{ apps | dict2items }}"
 
     - name: Template the Caddyfile
       template: src=../templates/Caddyfile.j2 dest=./Caddyfile.j2
+
     - name: Create Directory for docker compose files
       file:
         path: "{{item.key}}"
@@ -21,13 +18,22 @@
         mode: '0755'
       loop: "{{ apps.hosts.apps | dict2items }}"
       when: item.value.type == "app" and item.value.name is defined
+
     - name: Template docker compose files
       template: src=../templates/docker-compose.yml.j2 dest=./{{item.key}}/docker-compose.yml
       loop: "{{ apps.hosts.apps | dict2items }}"
       when: item.value.type == "app" and item.value.name is defined
-  # roles:
-  #   - role: caddy_ansible.caddy_ansible
-  #     caddy_update: true
-  #     caddy_systemd_capabilities_enabled: true
-  #     caddy_systemd_network_dependency: false
-  #     caddy_config: "{{ lookup('template', 'Caddyfile.j2') }}"
+
+  roles:
+    - role: caddy_ansible.caddy_ansible
+      caddy_update: true
+      caddy_systemd_capabilities_enabled: true
+      caddy_systemd_network_dependency: false
+      caddy_config: "{{ lookup('template', 'Caddyfile.j2') }}"
+      notify:
+      - Clean up template Caddyfile
+  handlers:
+    - name: Clean up template Caddyfile
+      file:
+        path: ./Caddyfile.j2
+        state: absent
