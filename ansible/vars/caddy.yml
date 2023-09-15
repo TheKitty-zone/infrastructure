@@ -28,52 +28,52 @@ caddy:
             additonal_config: ""
           - domain: "lidarr.{{ global.base_domain }}"
             upstream_port: 8686
-        use_authelia: true
+        use_authelia: false
     apps:
       "Jellyfin":
         type: app
         domain: "jelly.{{ global.base_domain }}"
         upstream: 172.17.0.1:8096
-        use_authelia: true
+        use_authelia: false
 
       "Jellyseerr":
         type: app
         domain: "jellyseerr.{{ global.base_domain }}"
         upstream: 172.17.0.1:5055
-        use_authelia: true
+        use_authelia: false
 
       "portainer":
         type: app
         domain: "docker.{{ global.base_domain }}"
         upstream: 172.17.0.1:9000
-        use_authelia: true
+        use_authelia: false
 
       "Grafana":
         type: app
         domain: "grafana.{{ global.base_domain }}"
         upstream: 172.17.0.1:3000
-        use_authelia: true
+        use_authelia: false
 
       "Mealie":
         type: app
         domain: "mealie.{{ global.base_domain }}"
         upstream: 172.17.0.1:9925
-        use_authelia: true
+        use_authelia: false
 
       "Prometheus":
         type: app
         domain: "prom.{{ global.base_domain }}"
         upstream: 172.17.0.1:9100
-        use_authelia: true
+        use_authelia: false
 
       "Sabnzbd":
         type: app
         domain: "sab.{{ global.base_domain }}"
         upstream: 172.17.0.1:8080
-        use_authelia: true
+        use_authelia: false
 
       "Seafile":
         type: app
         domain: "sea.cloud.yuri.li"
         upstream: 172.17.0.1:8947
-        use_authelia: true
+        use_authelia: false
