@@ -1,6 +1,6 @@
 - hosts: caddy
   user: root
-  tasks:
+  pre_tasks:
     - name: Merge vars
       ansible.builtin.include_vars:
         dir: vars/
@@ -9,8 +9,8 @@
         apps: "{{ caddy | combine(docker, recursive=True) }}"
 
     - name: Template the Caddyfile
-      template: src=../templates/Caddyfile.j2 dest=./Caddyfile.j2
-
+      template: src=../templates/Caddyfile.j2 dest=/root/Caddyfile.j2
+  tasks:
     - name: Create Directory for docker compose files
       file:
         path: "{{item.key}}"
@@ -29,11 +29,11 @@
       caddy_update: true
       caddy_systemd_capabilities_enabled: true
       caddy_systemd_network_dependency: false
-      caddy_config: "{{ lookup('template', 'Caddyfile.j2') }}"
+      caddy_config: "{{ lookup('template', '/root/Caddyfile.j2') }}"
       notify:
       - Clean up template Caddyfile
   handlers:
     - name: Clean up template Caddyfile
       file:
-        path: ./Caddyfile.j2
+        path: /root/Caddyfile.j2
         state: absent
