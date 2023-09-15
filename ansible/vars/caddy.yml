@@ -4,9 +4,6 @@ caddy:
   # e.g acme etc.
   # Templating is supported.
   static_config: |
-    {
-        acme_dns cloudflare {{ lookup('env', 'CLOUDFLARE_API_TOKEN') }}
-    }
     # Authelia Portal.
     auth.{{ global.base_domain }} {
             reverse_proxy 172.17.0.1:9091
@@ -74,6 +71,14 @@ caddy:
 
       "Seafile":
         type: app
+        disable_dns_challenge: true
         domain: "sea.cloud.yuri.li"
         upstream: 172.17.0.1:8947
+        use_authelia: false
+        
+      "Linkding":
+        type: app
+        disable_dns_challenge: true
+        domain: "dash.cloud.yuri.li"
+        upstream: 172.17.0.1:8948
         use_authelia: false

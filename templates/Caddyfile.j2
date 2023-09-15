@@ -14,6 +14,13 @@
         }
 {% endif %}
         reverse_proxy {{ apps.hosts.groups[group_name].base_upstream }}:{{ app.upstream_port }}
+{% if apps.hosts.groups[group_name].disable_dns_challange is defined and  apps.hosts.groups[group_name].disable_dns_challange %}
+	tls {
+		issuer acme {
+			dns cloudflare {{ lookup('env', 'CLOUDFLARE_API_TOKEN') }}
+		}
+	}
+{% endif %}
 }
 {% endfor %}
 {% endfor %}
@@ -27,6 +34,13 @@
         }
 {% endif %}
         reverse_proxy {{ apps.hosts.apps[app_name].upstream }}
+{% if apps.hosts.apps[app_name].disable_dns_challange is defined and  apps.hosts.apps[app_name].disable_dns_challange %}
+	tls {
+		issuer acme {
+			dns cloudflare {{ lookup('env', 'CLOUDFLARE_API_TOKEN') }}
+		}
+	}
+{% endif %}
 }
 {% endfor %}
 
