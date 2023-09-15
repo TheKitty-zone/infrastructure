@@ -87,3 +87,9 @@ caddy:
         domain: "torrent.{{ global.base_domain }}"
         upstream: 172.17.0.1:8112
         use_authelia: false
+
+      "Jackett":
+        type: app
+        domain: "jackett.{{ global.base_domain }}"
+        upstream: 172.17.0.1:9117
+        use_authelia: false
