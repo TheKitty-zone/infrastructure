@@ -14,7 +14,8 @@
         apps: "{{ caddy }}"
       when: caddy is defined and docker is not defined
     - name: Template the Caddyfile
-      template: src=../templates/Caddyfile.j2 dest=/root/Caddyfile.j2
+      template: src=../templates/Caddyfile.j2 dest=./Caddyfile.j2
+      delegate_to: localhost
   tasks:
     - name: Create Directory for docker compose files
       file:
@@ -34,11 +35,11 @@
       caddy_update: true
       caddy_systemd_capabilities_enabled: true
       caddy_systemd_network_dependency: false
-      caddy_config: "{{ lookup('template', '/root/Caddyfile.j2') }}"
+      caddy_config: "{{ lookup('template', './Caddyfile.j2') }}"
       notify:
       - Clean up template Caddyfile
   handlers:
     - name: Clean up template Caddyfile
       file:
-        path: /root/Caddyfile.j2
+        path: ./Caddyfile.j2
         state: absent
