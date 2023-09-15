@@ -9,7 +9,7 @@ caddy:
     }
     # Authelia Portal.
     auth.{{ global.base_domain }} {
-            reverse_proxy authelia:9091
+            reverse_proxy 172.17.0.1:9091
     }
   # Dynamic config that will be appended to the generated Caddyfile
   # e.g reverse_proxy etc.
