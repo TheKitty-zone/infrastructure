@@ -29,6 +29,18 @@
       template: src=../templates/docker-compose.yml.j2 dest=./{{item.key}}/docker-compose.yml
       loop: "{{ apps.hosts.apps | dict2items }}"
       when: item.value.type == "app" and item.value.name is defined
+    
+    - name: Fix caddy service file by replacing user and group
+      replace:
+        path: /etc/systemd/system/caddy.service
+        regexp: "(User|Group)=www-data"
+        replace: ""
+
+    - name: Reload systemd and restart caddy
+      systemd:
+        daemon_reload: yes
+        name: caddy
+        state: restarted
 
   roles:
     - role: caddy_ansible.caddy_ansible
@@ -37,5 +49,4 @@
       caddy_systemd_network_dependency: false
       caddy_packages: ["github.com/caddy-dns/cloudflare"]
       caddy_config: "{{ lookup('template', './Caddyfile.j2') }}"
-      notify:
-      - Clean up template Caddyfile
+    
