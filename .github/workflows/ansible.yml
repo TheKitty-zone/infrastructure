@@ -36,7 +36,7 @@ jobs:
       - name: Run Ansible Playbook
         run: |
           echo ${{ secrets.ANSIBLE_VAULT_PASSWORD }} > .vault_pass.txt
-          ansible-playbook -i ansible/inventory.yml ansible/playbook.yml
+          ansible-playbook -i inventory.yml playbook.yml
           rm .vault_pass.txt
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
