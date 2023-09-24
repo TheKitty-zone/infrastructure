@@ -1,0 +1,14 @@
+---
+# tasks file for docker
+
+- name: Debug
+  debug:
+    msg: "{{ app }}"
+
+- name: Deploy container if its an app
+  include_tasks: container.yml
+  when: app.type == "app"
+
+- name: Deploy compose stack if its a stack
+  include_tasks: docker-compose.yml
+  when: app.type == "group"

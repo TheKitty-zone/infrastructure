@@ -1,0 +1,22 @@
+- hosts: localhost
+  user: root
+  vars_files:
+    - vars/main.yml
+  tasks:
+    - name: Deploy app role if it is to be managed
+      include_role:
+        name: docker
+      vars:
+        app: "{{ item.value }}"
+        app_name: "{{ item.key | lower }}"
+      loop: "{{ apps.apps | dict2items }}"
+      when: item.value.manage and item.value.docker_settings is defined
+
+    - name: Deploy stack role if it is to be managed
+      include_role:
+        name: docker
+      vars:
+        app: "{{ item.value }}"
+        app_name: "{{ item.key | lower }}"
+      loop: "{{ apps.groups | dict2items }}"
+      when: item.value.manage and item.value.docker_settings is defined

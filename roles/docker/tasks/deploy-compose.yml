@@ -1,0 +1,15 @@
+
+- name: Check if directory exists
+  stat:
+    path: "{{ app_name }}"
+  register: dir_exists
+
+- name: Create Directory for docker compose files
+  file:
+    path: "{{ app_name }}"
+    state: directory
+    mode: '0755'
+  when: not dir_exists.stat.exists
+
+- name: Template docker compose files
+  template: src=docker-compose.yml.j2 dest=./{{ app_name }}/docker-compose.yml

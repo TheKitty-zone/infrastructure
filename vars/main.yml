@@ -1,0 +1,125 @@
+---
+caddy:
+  base_domain: thekitty.zone
+
+apps:
+  groups:
+    "*Arr":
+      type: group
+      base_upstream: 172.17.0.1
+      domains:
+        - domain: "sonarr.{{ caddy.base_domain }}"
+          upstream_port: 8989
+        - domain: "radarr.{{ caddy.base_domain }}"
+          upstream_port: 7878
+        - domain: "readarr.{{ caddy.base_domain }}"
+          upstream_port: 8787
+        - domain: "lidarr.{{ caddy.base_domain }}"
+          upstream_port: 8686
+      use_authelia: false
+      manage: false
+  apps:
+    "Jellyfin":
+      type: app
+      domain: "jelly.{{ caddy.base_domain }}"
+      upstream: 172.17.0.1:8096
+      use_authelia: false
+      manage: false
+
+    "Jellyseerr":
+      type: app
+      domain: "jellyseerr.{{ caddy.base_domain }}"
+      upstream: 172.17.0.1:5055
+      use_authelia: false
+      manage: false
+
+    "portainer":
+      type: app
+      domain: "docker.{{ caddy.base_domain }}"
+      upstream: 172.17.0.1:9000
+      use_authelia: false
+      manage: false
+
+    "Grafana":
+      type: app
+      domain: "grafana.{{ caddy.base_domain }}"
+      upstream: 172.17.0.1:3000
+      use_authelia: false
+      manage: false
+
+    "Mealie":
+      type: app
+      domain: "mealie.{{ caddy.base_domain }}"
+      upstream: 172.17.0.1:9925
+      use_authelia: false
+      manage: false
+
+    "Prometheus":
+      type: app
+      domain: "prom.{{ caddy.base_domain }}"
+      upstream: 172.17.0.1:9100
+      use_authelia: false
+      manage: false
+
+    "Sabnzbd":
+      type: app
+      domain: "sab.{{ caddy.base_domain }}"
+      upstream: 172.17.0.1:8080
+      use_authelia: false
+      manage: false
+
+    "Seafile":
+      type: app
+      disable_dns_challenge: true
+      domain: "sea.cloud.yuri.li"
+      upstream: 172.17.0.1:8947
+      use_authelia: false
+      manage: false
+      
+    "Linkding":
+      type: app
+      disable_dns_challenge: true
+      domain: "dash.cloud.yuri.li"
+      upstream: 172.17.0.1:8948
+      use_authelia: false
+      manage: false
+
+    "Deluge":
+      type: app
+      domain: "torrent.{{ caddy.base_domain }}"
+      upstream: 172.17.0.1:8112
+      use_authelia: false
+      manage: false
+
+    "Jackett":
+      type: app
+      domain: "jackett.{{ caddy.base_domain }}"
+      upstream: 172.17.0.1:9117
+      use_authelia: false
+      manage: false
+
+    "Prowlarr":
+      type: app
+      domain: "prowlarr.{{ caddy.base_domain }}"
+      upstream: 172.17.0.1:9100
+      use_authelia: false
+      manage: true
+      docker_settings:
+        image: linuxserver/prowlarr
+        container_name: prowlarr
+        ports:
+          - "9100:10"
+        environment:
+          PUID: "1000"
+          PGID: "1000"
+          TZ: Europe/Berlin
+        mounts:
+          - type: bind
+            source: /home/TV
+            target: /tv
+          - type: bind
+            source: /home/Movies
+            target: /movies
+          - type: bind
+            source: /home/Downloads
+            target: /downloads

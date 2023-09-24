@@ -1,0 +1,13 @@
+- name: (Re)Create container
+  community.docker.docker_container:
+    name: "{{ app.docker_settings.container_name }}"
+    image: "{{ app.docker_settings.image }}"
+    state: "{{ app.docker_settings.state if app.docker_settings.state is defined else default_state }}"
+    pull: "{{ app.docker_settings.pull if app.docker_settings.pull is defined else default_pull }}"
+    restart_policy: "{{ app.docker_settings.restart_policy if app.docker_settings.restart_policy is defined else default_restart_policy }}"
+    restart_retries: "{{ app.docker_settings.restart_retries if app.docker_settings.restart_policy is defined and app.docker_settings.restart_policy == 'on-failure' else omit }}"
+    recreate: "{{ app.docker_settings.recreate if app.docker_settings.recreate is defined else default_recreate }}"
+    mounts: "{{ app.docker_settings.mounts }}"
+    ports: "{{ app.docker_settings.ports }}"
+    env: "{{ app.docker_settings.environment | string if app.docker_settings.environment is defined else omit }}"
+

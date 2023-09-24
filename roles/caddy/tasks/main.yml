@@ -1,0 +1,144 @@
+---
+# tasks file for caddy
+- name: Template the Caddyfile
+  template: src=Caddyfile.j2 dest=./Caddyfile.j2
+  delegate_to: localhost
+
+- name: Include tasks for pre-setup checks
+  ansible.builtin.include_tasks: preflight.yml
+
+- name: Include tasks to install packages
+  ansible.builtin.include_tasks: packages-{{ ansible_pkg_mgr }}.yml
+
+- name: Build headers to use when making requests to github
+  ansible.builtin.set_fact:
+    caddy_github_headers: "{{ caddy_github_headers | combine({'Authorization': 'token ' + caddy_github_token}) }}"
+  when: caddy_github_token | length > 0
+
+- name: Get all Caddy releases
+  ansible.builtin.get_url:
+    url: https://api.github.com/repos/caddyserver/caddy/git/refs/tags
+    dest: "{{ caddy_home }}/releases.txt"
+    force: true
+    headers: '{{ caddy_github_headers }}'
+    mode: 0640
+  retries: 3
+  delay: 2
+  when: caddy_update
+  register: caddy_releases_cache
+
+- name: Set Caddy features
+  ansible.builtin.copy:
+    content: "{{ ','.join(caddy_packages) }}"
+    dest: "{{ caddy_home }}/features.txt"
+    mode: 0640
+  when: caddy_update
+  register: caddy_features_cache
+
+- name: Include tasks to build github URL if downloading from github
+  ansible.builtin.include_tasks: github-url.yml
+  when: caddy_use_github
+
+- name: Download Caddy
+  ansible.builtin.get_url:
+    url: "{{ caddy_url }}"
+    checksum: "{{ caddy_checksum_url | default(omit) }}"
+    dest: "{{ caddy_home }}/{{ 'caddy.tar.gz' if caddy_use_github else 'caddy' }}"
+    force: true
+    timeout: "{{ caddy_download_timeout }}"
+    mode: 0644
+  retries: 3
+  delay: 2
+  when: caddy_releases_cache.changed or caddy_features_cache.changed
+  register: caddy_binary_cache
+  tags: skip_ansible_lint
+
+- name: Download Caddy
+  ansible.builtin.get_url:
+    url: "{{ caddy_url }}"
+    checksum: "{{ caddy_checksum_url | default(omit) }}"
+    dest: "{{ caddy_home }}/{{ 'caddy.tar.gz' if caddy_use_github else 'caddy' }}"
+    timeout: "{{ caddy_download_timeout }}"
+    mode: 0644
+  retries: 3
+  delay: 2
+  register: caddy_download
+  tags: skip_ansible_lint
+
+- name: Include tasks to extract files if downloading from github
+  ansible.builtin.include_tasks: github-extract.yml
+  when: caddy_use_github
+
+- name: Copy Caddy Binary
+  ansible.builtin.copy:
+    src: "{{ caddy_home }}/caddy"
+    dest: "{{ caddy_bin }}"
+    mode: 0755
+    remote_src: true
+  notify:
+    - Restart caddy
+
+- name: Ansible check caddy_certs_dir.
+  stat:
+    path: "{{ caddy_certs_dir }}"
+  register: caddy_certs_dir_exists
+
+- name: Create caddy_certs_dir
+  ansible.builtin.file:
+    path: "{{ caddy_certs_dir }}"
+    state: directory
+    mode: 0770
+  when: caddy_certs_dir_exists.stat.exists == False
+
+- name: Create config directory
+  ansible.builtin.file:
+    path: "{{ caddy_conf_dir }}"
+    state: directory
+    mode: 0770
+
+- name: Create log directory
+  ansible.builtin.file:
+    path: "{{ caddy_log_dir }}"
+    state: directory
+    mode: 0775
+
+- name: Get information about Caddy config file
+  ansible.builtin.stat:
+    path: "{{ caddy_conf_dir }}/{{ caddy_conf_filename }}"
+  register: caddy_config_stat
+
+- name: Create caddy config
+  ansible.builtin.copy:
+    content: "{{ caddy_config }}"
+    dest: "{{ caddy_conf_dir }}/{{ caddy_conf_filename }}"
+    mode: 0640
+  when:
+    - caddy_config_update or not caddy_config_stat.stat.exists
+  notify:
+    - Reload caddy
+
+- name: Template systemd service
+  ansible.builtin.template:
+    src: caddy.service
+    dest: "/etc/systemd/system/{{ caddy_service_name }}"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - Restart caddy
+
+- name: Set capability on the binary file to be able to bind to TCP port <1024
+  community.general.capabilities:
+    path: "{{ caddy_bin }}"
+    capability: cap_net_bind_service+eip
+    state: present
+  when: caddy_setcap
+
+- name: Ensure caddy service is up-to-date before starting it
+  ansible.builtin.meta: flush_handlers
+
+- name: Start Caddy service
+  ansible.builtin.systemd:
+    name: caddy
+    state: started
+    enabled: true

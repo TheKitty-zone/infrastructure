@@ -1,0 +1,44 @@
+# The appsfile template, that will be tampleted here.
+# You have access to all variables defined in ansible
+
+{% for group_name  in apps.groups %}
+# Group {{ group_name }}:
+{% for app in apps.groups[group_name].domains %}
+{{ app.domain }} {
+{% if apps.groups[group_name].use_authelia %}
+        forward_auth 172.17.0.1:9091 {
+                uri /api/verify?rd=https://auth.{{ caddy.base_domain }}/
+                copy_headers Remote-User Remote-Groups Remote-Name Remote-Email
+        }
+{% endif %}
+        reverse_proxy {{ apps.groups[group_name].base_upstream }}:{{ app.upstream_port }}
+{% if apps.groups[group_name].disable_dns_challange is defined and  apps.groups[group_name].disable_dns_challange %}
+	tls {
+		issuer acme {
+			dns cloudflare {{ lookup('env', 'CLOUDFLARE_API_TOKEN') }}
+		}
+	}
+{% endif %}
+}
+{% endfor %}
+{% endfor %}
+{% for app_name in apps.apps %}
+# App {{ app_name }}:
+{{ apps.apps[app_name].domain }} {
+{% if apps.apps[app_name].use_authelia %}
+        forward_auth 172.17.0.1:9091 {
+                uri /api/verify?rd=https://auth.{{ caddy.base_domain }}/
+                copy_headers Remote-User Remote-Groups Remote-Name Remote-Email
+        }
+{% endif %}
+        reverse_proxy {{ apps.apps[app_name].upstream }}
+{% if apps.apps[app_name].disable_dns_challange is defined and  apps.apps[app_name].disable_dns_challange %}
+	tls {
+		issuer acme {
+			dns cloudflare {{ lookup('env', 'CLOUDFLARE_API_TOKEN') }}
+		}
+	}
+{% endif %}
+}
+{% endfor %}
+

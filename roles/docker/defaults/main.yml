@@ -1,0 +1,6 @@
+---
+# defaults file for docker
+default_pull: true
+default_state: started
+default_restart_policy: unless-stopped
+default_recreate: true
