@@ -7,7 +7,7 @@ services:
 {% if service.ports is defined  %}
     ports:
 {% for port in service.ports %}
-     - {{ port }}
+     - "{{ port }}"
 {% endfor %}
 {% endif %}
 {% if service.mounts is defined  %}
@@ -18,15 +18,15 @@ services:
 {% endif %}
     environment:
 {% for key, value in app.docker_settings.common_env.items() %}
-      {{ key }}: {{ value }}
+      {{ key }}: {{ value | quote }}
 {% endfor %}
 {% if service.environment is defined  %}
 {% for key, value in service.environment.items() %}
-      {{ key }}: {{ value }}
+      {{ key }}: {{ value | quote }}
 {% endfor %}
 {% endif %}
 {% if service.command is defined  %}
-    command: {{ service.command }}
+    command: "{{ service.command }}"
 {% endif %}
 {% if service.depends_on is defined  %}
     depends_on:
