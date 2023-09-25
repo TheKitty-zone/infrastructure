@@ -1,15 +1,15 @@
 
-- name: Check if directory exists
+- name: "Check if /opt/{{ app_name }} exists"
   stat:
     path: "/opt/{{ app_name }}"
   register: dir_exists
 
-- name: Create Directory for docker compose files
+- name: "Create Directory /opt/{{ app_name }}"
   file:
     path: "{{ app_name }}"
     state: directory
     mode: '0755'
-  when: not dir_exists.stat.exists
+  when: no dir_exists.stat.exists
 
 - name: Template docker compose files
   template: src=./docker-compose.yml.j2 dest=/opt/{{ app_name }}/docker-compose.yml

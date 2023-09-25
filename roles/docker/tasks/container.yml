@@ -1,3 +1,9 @@
+- name: Create mount directories if not present using mkdir
+  command: mkdir -p {{ mount }}
+  loop: "{{ app.docker_settings.mounts | map(attribute='source') | list }}"
+  loop_control:
+    loop_var: mount
+
 - name: (Re)Create container
   community.docker.docker_container:
     name: "{{ app.docker_settings.container_name }}"
