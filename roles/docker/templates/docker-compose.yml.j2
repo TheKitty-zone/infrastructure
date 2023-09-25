@@ -40,4 +40,9 @@ services:
       - {{ network }}
 {% endfor %}
 {% endif %}
+{% if service.extra_vars is defined %}
+{% for key, value in service.extra_vars.items() %}
+    {{ key }}: {{ value }}
+{% endfor %}
+{% endif %}
 {% endfor %}
