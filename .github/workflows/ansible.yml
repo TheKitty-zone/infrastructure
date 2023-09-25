@@ -5,8 +5,8 @@ on:
     branches:
       - main
     paths:
-      - ansible/**
-      - templates/**
+      - roles/**
+      - vars/**
       - .github/workflows/ansible.yml
 
 jobs:
