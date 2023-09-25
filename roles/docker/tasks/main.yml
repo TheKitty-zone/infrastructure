@@ -1,10 +1,5 @@
 ---
 # tasks file for docker
-
-- name: Debug
-  debug:
-    msg: "{{ app }}"
-
 - name: Deploy container if its an app
   include_tasks: container.yml
   when: app.type == "app"
