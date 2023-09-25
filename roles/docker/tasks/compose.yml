@@ -9,7 +9,7 @@
     path: "{{ app_name }}"
     state: directory
     mode: '0755'
-  when: no dir_exists.stat.exists
+  when: not dir_exists.stat.exists
 
 - name: Template docker compose files
   template: src=./docker-compose.yml.j2 dest=/opt/{{ app_name }}/docker-compose.yml
