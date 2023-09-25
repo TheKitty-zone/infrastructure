@@ -30,7 +30,7 @@ jobs:
           sudo apt install software-properties-common
           sudo apt-add-repository --yes --update ppa:ansible/ansible
           sudo apt install ansible
-          ansible-galaxy install caddy_ansible.caddy_ansible 
+          pip3 install docker
           ansible-galaxy collection install community.docker
 
       - name: Run Ansible Playbook
