@@ -10,5 +10,5 @@
   when: app.type == "app"
 
 - name: Deploy compose stack if its a stack
-  include_tasks: docker-compose.yml
+  include_tasks: compose.yml
   when: app.type == "group"
