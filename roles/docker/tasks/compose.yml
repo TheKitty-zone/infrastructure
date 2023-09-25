@@ -6,10 +6,10 @@
 
 - name: "Create Directory /opt/{{ app_name }}"
   file:
-    path: "{{ app_name }}"
+    path: "/opt/{{ app_name }}"
     state: directory
     mode: '0755'
-  when: not dir_exists.stat.exists
+  when: dir_exists.stat.exists == False
 
 - name: Template docker compose files
   template: src=./docker-compose.yml.j2 dest=/opt/{{ app_name }}/docker-compose.yml
